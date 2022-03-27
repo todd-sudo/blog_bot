@@ -30,9 +30,9 @@ func Run() {
 
 	ctx := context.Background()
 
-	repos := repository.NewRepository(ctx, db)
-	services := service.NewService(ctx, *repos)
-	handlers := handler.NewHandler(services)
+	repos := repository.NewRepository(ctx, db, log)
+	services := service.NewService(ctx, *repos, log)
+	handlers := handler.NewHandler(services, log)
 
 	srv := server.NewServer(cfg.App.Port, handlers.InitRoutes())
 

@@ -14,19 +14,25 @@ type User interface {
 }
 
 type Post interface {
-	InsertItem(ctx context.Context, b model.Post) (*model.Post, error)
-	DeleteItem(ctx context.Context, b model.Post) error
-	AllItem(ctx context.Context) ([]*model.Post, error)
+	InsertPost(ctx context.Context, b model.Post) (*model.Post, error)
+	DeletePost(ctx context.Context, b model.Post) error
+	AllPost(ctx context.Context) ([]*model.Post, error)
+}
+
+type Category interface {
+	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
 }
 
 type Repository struct {
 	User
 	Post
+	Category
 }
 
 func NewRepository(ctx context.Context, db *gorm.DB, log logging.Logger) *Repository {
 	return &Repository{
-		// User: NewUserRepository(ctx, db),
-		Post: NewPostRepository(ctx, db, log),
+		User:     NewUserRepository(ctx, db, log),
+		Post:     NewPostRepository(ctx, db, log),
+		Category: NewCategoryRepository(ctx, db, log),
 	}
 }

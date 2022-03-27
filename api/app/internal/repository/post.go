@@ -8,10 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
-//BookRepository is a ....
 type PostRepository interface {
-	InsertItem(ctx context.Context, b model.Post) (*model.Post, error)
-	AllItem(ctx context.Context) ([]*model.Post, error)
+	InsertPost(ctx context.Context, b model.Post) (*model.Post, error)
+	AllPost(ctx context.Context) ([]*model.Post, error)
+	DeletePost(ctx context.Context, post model.Post) error
 }
 
 type postConnection struct {
@@ -29,10 +29,10 @@ func NewPostRepository(ctx context.Context, dbConn *gorm.DB, log logging.Logger)
 }
 
 // Добавление item
-func (db *postConnection) InsertItem(ctx context.Context, post model.Post) (*model.Post, error) {
+func (db *postConnection) InsertPost(ctx context.Context, post model.Post) (*model.Post, error) {
 	tx := db.connection.WithContext(ctx)
 	tx.Save(&post)
-	res := tx.Preload("User").Find(&post)
+	res := tx.Preload("User").Preload("Category").Find(&post)
 	if res.Error != nil {
 		db.log.Errorf("inset post error: %v", res.Error)
 		return nil, res.Error
@@ -41,10 +41,10 @@ func (db *postConnection) InsertItem(ctx context.Context, post model.Post) (*mod
 }
 
 // Все посты
-func (db *postConnection) AllItem(ctx context.Context) ([]*model.Post, error) {
+func (db *postConnection) AllPost(ctx context.Context) ([]*model.Post, error) {
 	tx := db.connection.WithContext(ctx)
 	var posts []*model.Post
-	res := tx.Preload("User").Find(&posts)
+	res := tx.Preload("User").Preload("Category").Find(&posts)
 	if res.Error != nil {
 		db.log.Errorf("get all posts error %v", res.Error)
 		return nil, res.Error
@@ -53,7 +53,7 @@ func (db *postConnection) AllItem(ctx context.Context) ([]*model.Post, error) {
 }
 
 // Удаление поста
-func (db *postConnection) DeleteItem(ctx context.Context, post model.Post) error {
+func (db *postConnection) DeletePost(ctx context.Context, post model.Post) error {
 	tx := db.connection.WithContext(ctx)
 	res := tx.Delete(&post)
 	if res.Error != nil {
