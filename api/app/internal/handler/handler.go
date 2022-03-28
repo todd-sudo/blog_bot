@@ -28,6 +28,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		blogRoutes.DELETE("/:id", h.DeletePost)
 	}
 
+	categoryRoutes := r.Group("api/categories")
+	{
+		categoryRoutes.GET("/", h.AllCategory)
+		categoryRoutes.POST("/", h.InsertCategory)
+		categoryRoutes.DELETE("/:id", h.DeleteCategory)
+	}
+
 	userRoutes := r.Group("api/user")
 	{
 		userRoutes.GET("/profile", h.ProfileUser)

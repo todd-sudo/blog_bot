@@ -18,7 +18,7 @@ func (c *Handler) CreateUser(ctx *gin.Context) {
 	}
 
 	userStatus, err := c.service.User.IsDuplicateUserTGID(ctx, createDTO.UserTGId)
-	c.log.Info(userStatus)
+	c.log.Infoln(userStatus)
 	if err == nil || userStatus {
 		response := helper.BuildErrorResponse("Failed to process request", "Duplicate user_tg_id", helper.EmptyObj{})
 		ctx.JSON(http.StatusConflict, response)

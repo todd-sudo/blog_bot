@@ -22,14 +22,22 @@ type User interface {
 	IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error)
 }
 
+type Category interface {
+	Insert(ctx context.Context, b dto.CreateCategoryDTO) (*model.Category, error)
+	Delete(ctx context.Context, b model.Category) error
+	All(ctx context.Context) ([]*model.Category, error)
+}
+
 type Service struct {
 	Post
 	User
+	Category
 }
 
 func NewService(ctx context.Context, r repository.Repository, log logging.Logger) *Service {
 	return &Service{
-		Post: NewPostService(ctx, r.Post, log),
-		User: NewUserService(ctx, r.User, log),
+		Post:     NewPostService(ctx, r.Post, log),
+		User:     NewUserService(ctx, r.User, log),
+		Category: NewCategoryService(ctx, r.Category, log),
 	}
 }

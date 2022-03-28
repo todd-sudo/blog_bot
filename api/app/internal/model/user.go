@@ -5,6 +5,6 @@ type User struct {
 	FirstName string  `gorm:"type:varchar(255)" json:"first_name,omitempty"`
 	LastName  string  `gorm:"type:varchar(255)" json:"last_name,omitempty"`
 	Username  string  `gorm:"type:varchar(255)" json:"username"`
-	UserTGId  int64   `gorm:"type:varchar(255)" json:"user_tg_id"`
+	UserTGId  int     `gorm:"type:int;unique;not null" json:"user_tg_id"`
 	Posts     *[]Post `json:"posts,omitempty"`
 }

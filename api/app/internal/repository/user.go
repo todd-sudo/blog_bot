@@ -33,8 +33,9 @@ func NewUserRepository(ctx context.Context, db *gorm.DB, log logging.Logger) Use
 func (db *userConnection) IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error) {
 	var user *model.User
 	res := db.connection.WithContext(ctx).Where("user_tg_id = ?", tgID).Take(&user)
+	db.log.Debug(res.Error)
 	if res.Error != nil {
-		db.log.Errorf("is duplicate user_tg_id error %v", res.Error)
+		db.log.Error(res.Error)
 		return true, res.Error
 	}
 	return false, nil

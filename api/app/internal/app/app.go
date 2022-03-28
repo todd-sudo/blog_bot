@@ -26,7 +26,7 @@ func Run() {
 
 	db, err := repository.NewPostgresDB(cfg, &log)
 	if err != nil {
-		log.Error(err)
+		panic("database connect error" + err.Error())
 	}
 	log.Info("Connect to database successfully!")
 
@@ -40,14 +40,17 @@ func Run() {
 	log.Info("Connect services successfully!")
 
 	srv := server.NewServer(cfg.App.Port, handlers.InitRoutes())
+	if cfg.App.GinMode == "release" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-			log.Errorf("error occurred while running http server: %s\n", err.Error())
+			panic("error occurred while running http server: " + err.Error())
 		}
 	}()
 
-	log.Info("Server started on http://127.0.0.1:" + cfg.App.Port + "Gin MODE = " + gin.Mode())
+	log.Info("Server started on http://127.0.0.1:" + cfg.App.Port + " Gin MODE = " + gin.Mode())
 
 	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)
