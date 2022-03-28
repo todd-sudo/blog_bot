@@ -18,7 +18,7 @@ services:
     volumes:
       - .:/go/src/app
 
-    command: ["go", "run", "/go/src/app/cmd/web/main.go"]
+    command: ["go", "run", "/go/src/app/cmd/main/main.go"]
 
   db:
     image: postgres:12

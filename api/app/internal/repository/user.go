@@ -12,6 +12,7 @@ import (
 type UserRepository interface {
 	InsertUser(ctx context.Context, user model.User) (*model.User, error)
 	ProfileUser(ctx context.Context, userID string) (*model.User, error)
+	IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error)
 }
 
 type userConnection struct {
@@ -27,6 +28,16 @@ func NewUserRepository(ctx context.Context, db *gorm.DB, log logging.Logger) Use
 		connection: db,
 		log:        log,
 	}
+}
+
+func (db *userConnection) IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error) {
+	var user *model.User
+	res := db.connection.WithContext(ctx).Where("user_tg_id = ?", tgID).Take(&user)
+	if res.Error != nil {
+		db.log.Errorf("is duplicate user_tg_id error %v", res.Error)
+		return true, res.Error
+	}
+	return false, nil
 }
 
 // Добавление пользователя

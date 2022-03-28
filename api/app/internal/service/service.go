@@ -9,25 +9,27 @@ import (
 	"github.com/todd-sudo/blog_bot/api/pkg/logging"
 )
 
-type Item interface {
-	Insert(ctx context.Context, b dto.ItemCreateDTO) (*model.Post, error)
+type Post interface {
+	Insert(ctx context.Context, b dto.PostCreateDTO) (*model.Post, error)
 	Delete(ctx context.Context, b model.Post) error
 	All(ctx context.Context) ([]*model.Post, error)
+	IsAllowedToEdit(ctx context.Context, userID string, postID uint64) (bool, error)
 }
 
 type User interface {
-	CreateUser(ctx context.Context, user dto.CreateUserDTO) (*model.User, error)
+	Insert(ctx context.Context, user dto.CreateUserDTO) (*model.User, error)
 	Profile(ctx context.Context, userID string) (*model.User, error)
+	IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error)
 }
 
 type Service struct {
-	Item
+	Post
 	User
 }
 
 func NewService(ctx context.Context, r repository.Repository, log logging.Logger) *Service {
 	return &Service{
-		// Item: NewItemService(ctx, r.Item),
-		// User: NewUserService(ctx, r.User),
+		Post: NewPostService(ctx, r.Post, log),
+		User: NewUserService(ctx, r.User, log),
 	}
 }

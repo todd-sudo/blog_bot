@@ -12,6 +12,7 @@ type PostRepository interface {
 	InsertPost(ctx context.Context, b model.Post) (*model.Post, error)
 	AllPost(ctx context.Context) ([]*model.Post, error)
 	DeletePost(ctx context.Context, post model.Post) error
+	FindPostByID(ctx context.Context, postID uint64) (*model.Post, error)
 }
 
 type postConnection struct {
@@ -61,4 +62,15 @@ func (db *postConnection) DeletePost(ctx context.Context, post model.Post) error
 		return res.Error
 	}
 	return nil
+}
+
+func (db *postConnection) FindPostByID(ctx context.Context, postID uint64) (*model.Post, error) {
+	tx := db.connection.WithContext(ctx)
+	var post model.Post
+	res := tx.Preload("User").Preload("Category").Find(&post, postID)
+	if res.Error != nil {
+		db.log.Errorf("find post by id error %v", res.Error)
+		return nil, res.Error
+	}
+	return &post, nil
 }

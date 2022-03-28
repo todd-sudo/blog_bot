@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/todd-sudo/blog_bot/api/internal/config"
 	"github.com/todd-sudo/blog_bot/api/internal/handler"
 	"github.com/todd-sudo/blog_bot/api/internal/repository"
@@ -18,21 +19,25 @@ import (
 )
 
 func Run() {
-
-	cfg := config.GetConfig()
+	logging.Init()
 	log := logging.GetLogger()
+	cfg := config.GetConfig()
+	log.Info("config init")
+
 	db, err := repository.NewPostgresDB(cfg, &log)
 	if err != nil {
 		log.Error(err)
 	}
-
 	log.Info("Connect to database successfully!")
 
 	ctx := context.Background()
 
 	repos := repository.NewRepository(ctx, db, log)
+	log.Info("Connect repository successfully!")
 	services := service.NewService(ctx, *repos, log)
+	log.Info("Connect services successfully!")
 	handlers := handler.NewHandler(services, log)
+	log.Info("Connect services successfully!")
 
 	srv := server.NewServer(cfg.App.Port, handlers.InitRoutes())
 
@@ -42,7 +47,7 @@ func Run() {
 		}
 	}()
 
-	log.Info("Server started on http://127.0.0.1:" + cfg.App.Port)
+	log.Info("Server started on http://127.0.0.1:" + cfg.App.Port + "Gin MODE = " + gin.Mode())
 
 	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)

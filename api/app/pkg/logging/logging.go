@@ -52,14 +52,15 @@ func Init() {
 			filename := path.Base(f.File)
 			return fmt.Sprintf("%s:%d", filename, f.Line), fmt.Sprintf("%s()", f.Function)
 		},
+		ForceColors:   true,
 		DisableColors: false,
 		FullTimestamp: true,
 	}
 
-	err := os.MkdirAll("logs", 0755)
+	err := os.MkdirAll("logs", 0777)
 
 	if err != nil || os.IsExist(err) {
-		panic("can't create log dir. no configured logging to files")
+		panic("can't create log dir. no configured logging to files | " + err.Error())
 	} else {
 		allFile, err := os.OpenFile("logs/all.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
 		if err != nil {
