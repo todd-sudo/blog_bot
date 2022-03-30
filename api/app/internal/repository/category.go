@@ -69,7 +69,7 @@ func (db *categoryConnection) AllCategory(ctx context.Context, userTgId int) ([]
 // Удаление category
 func (db *categoryConnection) DeleteCategory(ctx context.Context, category model.Category, userId int) error {
 	tx := db.connection.WithContext(ctx)
-	res := tx.Delete(&category)
+	res := tx.Select("Posts").Delete(&category)
 	if res.Error != nil {
 		db.log.Errorf("delete category error %v", res.Error)
 		return res.Error
