@@ -56,7 +56,10 @@ func (db *userConnection) InsertUser(ctx context.Context, user model.User) (*mod
 func (db *userConnection) ProfileUser(ctx context.Context, userID string) (*model.User, error) {
 	tx := db.connection.WithContext(ctx)
 	var user model.User
-	res := tx.Preload("Posts").Preload("Posts.User").Find(&user, userID)
+	res := tx.Preload("Categories").Preload("Posts").Where(
+		`"user_tg_id" = ?`,
+		userID,
+	).Find(&user)
 	if res.Error != nil {
 		db.log.Errorf("profile user error %v", res.Error)
 		return nil, res.Error

@@ -13,7 +13,7 @@ import (
 type CategoryService interface {
 	Insert(ctx context.Context, b dto.CreateCategoryDTO) (*model.Category, error)
 	Delete(ctx context.Context, b model.Category) error
-	All(ctx context.Context) ([]*model.Category, error)
+	All(ctx context.Context, userTgId int) ([]*model.Category, error)
 }
 
 type categoryService struct {
@@ -57,8 +57,8 @@ func (s *categoryService) Delete(ctx context.Context, c model.Category) error {
 	return nil
 }
 
-func (s *categoryService) All(ctx context.Context) ([]*model.Category, error) {
-	categories, err := s.categoryRepository.AllCategory(ctx)
+func (s *categoryService) All(ctx context.Context, userTgId int) ([]*model.Category, error) {
+	categories, err := s.categoryRepository.AllCategory(ctx, userTgId)
 	if err != nil {
 		s.log.Errorf("get all categories error: %v", err)
 		return nil, err

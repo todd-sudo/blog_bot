@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/todd-sudo/blog_bot/api/internal/dto"
@@ -10,7 +11,12 @@ import (
 )
 
 func (c *Handler) AllCategory(ctx *gin.Context) {
-	categories, err := c.service.Category.All(ctx)
+	userTgId := ctx.GetHeader("tg_user_id")
+	convUserTgId, err := strconv.Atoi(userTgId)
+	if err != nil {
+		c.log.Error(err)
+	}
+	categories, err := c.service.Category.All(ctx, convUserTgId)
 	if err != nil {
 		c.log.Errorf("get all categories error: %v", err)
 	}

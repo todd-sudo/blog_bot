@@ -26,12 +26,9 @@ func (c *Handler) InsertPost(ctx *gin.Context) {
 		res := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, res)
 	} else {
+		// tgUserID := ctx.GetHeader("tg_user_id")
+		// convertedTgUserID, err := strconv.ParseUint(tgUserID, 10, 64)
 
-		userID := ctx.GetHeader("user_id")
-		convertedUserID, err := strconv.ParseUint(userID, 10, 64)
-		if err == nil {
-			postCreateDTO.UserID = convertedUserID
-		}
 		item, err := c.service.Post.Insert(ctx, postCreateDTO)
 		if err != nil {
 			c.log.Errorf("insert post error: %v", err)

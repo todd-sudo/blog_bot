@@ -35,7 +35,7 @@ func (db *postConnection) InsertPost(ctx context.Context, post model.Post) (*mod
 	tx.Save(&post)
 	res := tx.Preload("User").Preload("Category").Find(&post)
 	if res.Error != nil {
-		db.log.Errorf("inset post error: %v", res.Error)
+		db.log.Errorf("insert post error: %v", res.Error)
 		return nil, res.Error
 	}
 	return &post, nil

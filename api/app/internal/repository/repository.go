@@ -23,7 +23,7 @@ type Post interface {
 
 type Category interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
-	AllCategory(ctx context.Context) ([]*model.Category, error)
+	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
 	DeleteCategory(ctx context.Context, category model.Category) error
 }
 

@@ -11,7 +11,7 @@ import (
 type CategoryRepository interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
 	DeleteCategory(ctx context.Context, category model.Category) error
-	AllCategory(ctx context.Context) ([]*model.Category, error)
+	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
 }
 
 type categoryConnection struct {
@@ -42,7 +42,7 @@ func NewCategoryRepository(ctx context.Context, dbConn *gorm.DB, log logging.Log
 func (db *categoryConnection) InsertCategory(ctx context.Context, category model.Category) (*model.Category, error) {
 	tx := db.connection.WithContext(ctx)
 	tx.Save(&category)
-	res := tx.Find(&category)
+	res := tx.Joins("User").Find(&category)
 	if res.Error != nil {
 		db.log.Errorf("insert category error: %v", res.Error)
 		return nil, res.Error
@@ -51,10 +51,13 @@ func (db *categoryConnection) InsertCategory(ctx context.Context, category model
 }
 
 // Все category
-func (db *categoryConnection) AllCategory(ctx context.Context) ([]*model.Category, error) {
+func (db *categoryConnection) AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error) {
 	tx := db.connection.WithContext(ctx)
 	var categories []*model.Category
-	res := tx.Preload("Posts").Find(&categories)
+	res := tx.Joins("Posts").Joins("User").Preload("User").Where(
+		`"User"."user_tg_id" = ?`,
+		userTgId,
+	).Find(&categories)
 	if res.Error != nil {
 		db.log.Errorf("get all categories error %v", res.Error)
 		return nil, res.Error
