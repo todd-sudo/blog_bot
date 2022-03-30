@@ -50,6 +50,7 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 	userID := ctx.GetHeader("user_id")
 
 	isAllowedToEdit, err := c.service.Post.IsAllowedToEdit(ctx, userID, post.ID)
+	c.log.Info(isAllowedToEdit)
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
 	}
