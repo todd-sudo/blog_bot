@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mashingan/smapping"
 	"github.com/todd-sudo/blog_bot/api/internal/dto"
@@ -12,8 +13,9 @@ import (
 
 type CategoryService interface {
 	Insert(ctx context.Context, b dto.CreateCategoryDTO) (*model.Category, error)
-	Delete(ctx context.Context, b model.Category) error
+	Delete(ctx context.Context, b model.Category, userTgId int) error
 	All(ctx context.Context, userTgId int) ([]*model.Category, error)
+	IsAllowedToEdit(ctx context.Context, userID string, postID uint64) (bool, error)
 }
 
 type categoryService struct {
@@ -48,8 +50,8 @@ func (s *categoryService) Insert(ctx context.Context, p dto.CreateCategoryDTO) (
 	return categoryM, nil
 }
 
-func (s *categoryService) Delete(ctx context.Context, c model.Category) error {
-	err := s.categoryRepository.DeleteCategory(ctx, c)
+func (s *categoryService) Delete(ctx context.Context, c model.Category, userTgId int) error {
+	err := s.categoryRepository.DeleteCategory(ctx, c, userTgId)
 	if err != nil {
 		s.log.Errorf("post delete error: %v", err)
 		return err
@@ -64,4 +66,16 @@ func (s *categoryService) All(ctx context.Context, userTgId int) ([]*model.Categ
 		return nil, err
 	}
 	return categories, nil
+}
+
+func (s *categoryService) IsAllowedToEdit(ctx context.Context, userID string, categoryID uint64) (bool, error) {
+	category, err := s.categoryRepository.FindCategoryByID(ctx, categoryID)
+	if err != nil {
+		s.log.Errorf("is allowed to edit category error: %v", err)
+		return false, err
+	}
+	id := fmt.Sprintf("%v", category.UserID)
+	s.log.Infoln(id)
+	s.log.Infoln(userID)
+	return userID == id, nil
 }

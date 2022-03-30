@@ -24,7 +24,8 @@ type Post interface {
 type Category interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
 	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
-	DeleteCategory(ctx context.Context, category model.Category) error
+	DeleteCategory(ctx context.Context, category model.Category, userId int) error
+	FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error)
 }
 
 type Repository struct {

@@ -26,6 +26,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		blogRoutes.GET("/", h.AllPost)
 		blogRoutes.POST("/", h.InsertPost)
 		blogRoutes.DELETE("/:id", h.DeletePost)
+		blogRoutes.GET("/:id", h.DeletePost)
 	}
 
 	categoryRoutes := r.Group("api/categories")

@@ -53,6 +53,8 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 	c.log.Info(isAllowedToEdit)
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
+		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusForbidden, response)
 	}
 
 	if isAllowedToEdit {

@@ -24,8 +24,9 @@ type User interface {
 
 type Category interface {
 	Insert(ctx context.Context, b dto.CreateCategoryDTO) (*model.Category, error)
-	Delete(ctx context.Context, b model.Category) error
+	Delete(ctx context.Context, b model.Category, userTgId int) error
 	All(ctx context.Context, userTgId int) ([]*model.Category, error)
+	IsAllowedToEdit(ctx context.Context, userID string, categoryID uint64) (bool, error)
 }
 
 type Service struct {

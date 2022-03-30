@@ -5,5 +5,5 @@ type Category struct {
 	Name   string  `gorm:"type:varchar(255);unique;not null" json:"name"`
 	Posts  *[]Post `json:"posts,omitempty"`
 	UserID uint64  `gorm:"not null" json:"-"`
-	User   User    `gorm:"foreignkey:UserID;constraint:onUpdate:CASCADE,onDelete:CASCADE" json:"-"`
+	User   User    `gorm:"foreignkey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 }

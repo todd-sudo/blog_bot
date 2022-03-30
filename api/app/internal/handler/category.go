@@ -40,12 +40,39 @@ func (c *Handler) InsertCategory(ctx *gin.Context) {
 	}
 }
 
-// Удаление Item
 func (c *Handler) DeleteCategory(ctx *gin.Context) {
 	var category model.Category
 
-	c.service.Category.Delete(ctx, category)
-	res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
-	ctx.JSON(http.StatusOK, res)
+	id, err := strconv.ParseUint(ctx.Param("id"), 0, 0)
+	if err != nil {
+		response := helper.BuildErrorResponse("Failed tou get id", "No param id were found", helper.EmptyObj{})
+		ctx.JSON(http.StatusBadRequest, response)
+	}
+	category.ID = id
+	userTgID := ctx.GetHeader("user_id")
+	isAllowedToEdit, err := c.service.Category.IsAllowedToEdit(ctx, userTgID, category.ID)
+
+	if err != nil {
+		c.log.Errorf("is allowed to edit error: %v", err)
+		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusForbidden, response)
+	}
+
+	convUserTgID, err := strconv.Atoi(userTgID)
+	if err != nil {
+		c.log.Error(err)
+		response := helper.BuildErrorResponse("Error", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusForbidden, response)
+	}
+	c.log.Info(isAllowedToEdit)
+
+	if isAllowedToEdit {
+		c.service.Category.Delete(ctx, category, convUserTgID)
+		res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
+		ctx.JSON(http.StatusOK, res)
+	} else {
+		response := helper.BuildErrorResponse("You dont have permission", "You are not the owner", helper.EmptyObj{})
+		ctx.JSON(http.StatusForbidden, response)
+	}
 
 }

@@ -10,8 +10,9 @@ import (
 
 type CategoryRepository interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
-	DeleteCategory(ctx context.Context, category model.Category) error
-	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
+	DeleteCategory(ctx context.Context, category model.Category, userTgId int) error
+	AllCategory(ctx context.Context, userId int) ([]*model.Category, error)
+	FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error)
 }
 
 type categoryConnection struct {
@@ -28,16 +29,16 @@ func NewCategoryRepository(ctx context.Context, dbConn *gorm.DB, log logging.Log
 	}
 }
 
-// func (db *categoryConnection) FindItemByID(ctx context.Context, categoryID uint64) (*model.Category, error) {
-// 	tx := db.connection.WithContext(ctx)
-// 	var category model.Category
-// 	res := tx.Preload("Posts").Find(&category, categoryID)
-// 	if res.Error != nil {
-// 		db.log.Errorf("find category by id error %v", res.Error)
-// 		return nil, res.Error
-// 	}
-// 	return &category, nil
-// }
+func (db *categoryConnection) FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error) {
+	tx := db.connection.WithContext(ctx)
+	var category model.Category
+	res := tx.Find(&category, categoryID)
+	if res.Error != nil {
+		db.log.Errorf("find category by id error %v", res.Error)
+		return nil, res.Error
+	}
+	return &category, nil
+}
 
 func (db *categoryConnection) InsertCategory(ctx context.Context, category model.Category) (*model.Category, error) {
 	tx := db.connection.WithContext(ctx)
@@ -66,7 +67,7 @@ func (db *categoryConnection) AllCategory(ctx context.Context, userTgId int) ([]
 }
 
 // Удаление category
-func (db *categoryConnection) DeleteCategory(ctx context.Context, category model.Category) error {
+func (db *categoryConnection) DeleteCategory(ctx context.Context, category model.Category, userId int) error {
 	tx := db.connection.WithContext(ctx)
 	res := tx.Delete(&category)
 	if res.Error != nil {
