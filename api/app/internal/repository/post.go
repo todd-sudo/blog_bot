@@ -10,7 +10,7 @@ import (
 
 type PostRepository interface {
 	InsertPost(ctx context.Context, b model.Post) (*model.Post, error)
-	AllPost(ctx context.Context) ([]*model.Post, error)
+	AllPost(ctx context.Context, userId int) ([]*model.Post, error)
 	DeletePost(ctx context.Context, post model.Post) error
 	FindPostByID(ctx context.Context, postID uint64) (*model.Post, error)
 }
@@ -33,7 +33,8 @@ func NewPostRepository(ctx context.Context, dbConn *gorm.DB, log logging.Logger)
 func (db *postConnection) InsertPost(ctx context.Context, post model.Post) (*model.Post, error) {
 	tx := db.connection.WithContext(ctx)
 	tx.Save(&post)
-	res := tx.Preload("User").Preload("Category").Find(&post)
+	// .Preload("User").Preload("Category")
+	res := tx.Find(&post)
 	if res.Error != nil {
 		db.log.Errorf("insert post error: %v", res.Error)
 		return nil, res.Error
@@ -42,10 +43,13 @@ func (db *postConnection) InsertPost(ctx context.Context, post model.Post) (*mod
 }
 
 // Все посты
-func (db *postConnection) AllPost(ctx context.Context) ([]*model.Post, error) {
+func (db *postConnection) AllPost(ctx context.Context, userId int) ([]*model.Post, error) {
 	tx := db.connection.WithContext(ctx)
 	var posts []*model.Post
-	res := tx.Preload("User").Preload("Category").Find(&posts)
+	res := tx.Preload("User").Where(
+		`"user_id" = ?`,
+		userId,
+	).Preload("Category").Find(&posts)
 	if res.Error != nil {
 		db.log.Errorf("get all posts error %v", res.Error)
 		return nil, res.Error

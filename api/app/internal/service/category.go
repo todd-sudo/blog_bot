@@ -13,7 +13,7 @@ import (
 
 type CategoryService interface {
 	Insert(ctx context.Context, b dto.CreateCategoryDTO) (*model.Category, error)
-	Delete(ctx context.Context, b model.Category, userTgId int) error
+	Delete(ctx context.Context, b model.Category) error
 	All(ctx context.Context, userTgId int) ([]*model.Category, error)
 	IsAllowedToEdit(ctx context.Context, userID string, postID uint64) (bool, error)
 }
@@ -50,8 +50,8 @@ func (s *categoryService) Insert(ctx context.Context, p dto.CreateCategoryDTO) (
 	return categoryM, nil
 }
 
-func (s *categoryService) Delete(ctx context.Context, c model.Category, userTgId int) error {
-	err := s.categoryRepository.DeleteCategory(ctx, c, userTgId)
+func (s *categoryService) Delete(ctx context.Context, c model.Category) error {
+	err := s.categoryRepository.DeleteCategory(ctx, c)
 	if err != nil {
 		s.log.Errorf("post delete error: %v", err)
 		return err

@@ -14,7 +14,7 @@ import (
 type PostService interface {
 	Insert(ctx context.Context, b dto.PostCreateDTO) (*model.Post, error)
 	Delete(ctx context.Context, b model.Post) error
-	All(ctx context.Context) ([]*model.Post, error)
+	All(ctx context.Context, userId int) ([]*model.Post, error)
 	IsAllowedToEdit(ctx context.Context, userID string, postID uint64) (bool, error)
 }
 
@@ -59,8 +59,8 @@ func (s *postService) Delete(ctx context.Context, p model.Post) error {
 	return nil
 }
 
-func (s *postService) All(ctx context.Context) ([]*model.Post, error) {
-	posts, err := s.postRepository.AllPost(ctx)
+func (s *postService) All(ctx context.Context, userId int) ([]*model.Post, error) {
+	posts, err := s.postRepository.AllPost(ctx, userId)
 	if err != nil {
 		s.log.Errorf("get all posts error: %v", err)
 		return nil, err

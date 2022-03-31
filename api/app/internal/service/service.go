@@ -12,7 +12,7 @@ import (
 type Post interface {
 	Insert(ctx context.Context, b dto.PostCreateDTO) (*model.Post, error)
 	Delete(ctx context.Context, b model.Post) error
-	All(ctx context.Context) ([]*model.Post, error)
+	All(ctx context.Context, userId int) ([]*model.Post, error)
 	IsAllowedToEdit(ctx context.Context, userID string, postID uint64) (bool, error)
 }
 
@@ -24,7 +24,7 @@ type User interface {
 
 type Category interface {
 	Insert(ctx context.Context, b dto.CreateCategoryDTO) (*model.Category, error)
-	Delete(ctx context.Context, b model.Category, userTgId int) error
+	Delete(ctx context.Context, b model.Category) error
 	All(ctx context.Context, userTgId int) ([]*model.Category, error)
 	IsAllowedToEdit(ctx context.Context, userID string, categoryID uint64) (bool, error)
 }

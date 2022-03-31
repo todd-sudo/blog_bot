@@ -10,7 +10,7 @@ import (
 
 type CategoryRepository interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
-	DeleteCategory(ctx context.Context, category model.Category, userTgId int) error
+	DeleteCategory(ctx context.Context, category model.Category) error
 	AllCategory(ctx context.Context, userId int) ([]*model.Category, error)
 	FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error)
 }
@@ -21,7 +21,11 @@ type categoryConnection struct {
 	log        logging.Logger
 }
 
-func NewCategoryRepository(ctx context.Context, dbConn *gorm.DB, log logging.Logger) CategoryRepository {
+func NewCategoryRepository(
+	ctx context.Context,
+	dbConn *gorm.DB,
+	log logging.Logger,
+) CategoryRepository {
 	return &categoryConnection{
 		ctx:        ctx,
 		connection: dbConn,
@@ -29,7 +33,11 @@ func NewCategoryRepository(ctx context.Context, dbConn *gorm.DB, log logging.Log
 	}
 }
 
-func (db *categoryConnection) FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error) {
+func (db *categoryConnection) FindCategoryByID(
+	ctx context.Context,
+	categoryID uint64,
+) (*model.Category, error) {
+
 	tx := db.connection.WithContext(ctx)
 	var category model.Category
 	res := tx.Find(&category, categoryID)
@@ -40,7 +48,11 @@ func (db *categoryConnection) FindCategoryByID(ctx context.Context, categoryID u
 	return &category, nil
 }
 
-func (db *categoryConnection) InsertCategory(ctx context.Context, category model.Category) (*model.Category, error) {
+func (db *categoryConnection) InsertCategory(
+	ctx context.Context,
+	category model.Category,
+) (*model.Category, error) {
+
 	tx := db.connection.WithContext(ctx)
 	tx.Save(&category)
 	res := tx.Joins("User").Find(&category)
@@ -51,8 +63,12 @@ func (db *categoryConnection) InsertCategory(ctx context.Context, category model
 	return &category, nil
 }
 
-// Все category
-func (db *categoryConnection) AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error) {
+// Показ категорий
+func (db *categoryConnection) AllCategory(
+	ctx context.Context,
+	userTgId int,
+) ([]*model.Category, error) {
+
 	tx := db.connection.WithContext(ctx)
 	var categories []*model.Category
 	res := tx.Joins("Posts").Joins("User").Preload("User").Where(
@@ -66,8 +82,12 @@ func (db *categoryConnection) AllCategory(ctx context.Context, userTgId int) ([]
 	return categories, nil
 }
 
-// Удаление category
-func (db *categoryConnection) DeleteCategory(ctx context.Context, category model.Category, userId int) error {
+// Удаление категории
+func (db *categoryConnection) DeleteCategory(
+	ctx context.Context,
+	category model.Category,
+) error {
+
 	tx := db.connection.WithContext(ctx)
 	res := tx.Select("Posts").Delete(&category)
 	if res.Error != nil {

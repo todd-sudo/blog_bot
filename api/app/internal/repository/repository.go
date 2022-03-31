@@ -17,14 +17,14 @@ type User interface {
 type Post interface {
 	InsertPost(ctx context.Context, b model.Post) (*model.Post, error)
 	DeletePost(ctx context.Context, b model.Post) error
-	AllPost(ctx context.Context) ([]*model.Post, error)
+	AllPost(ctx context.Context, userId int) ([]*model.Post, error)
 	FindPostByID(ctx context.Context, postID uint64) (*model.Post, error)
 }
 
 type Category interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
 	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
-	DeleteCategory(ctx context.Context, category model.Category, userId int) error
+	DeleteCategory(ctx context.Context, category model.Category) error
 	FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error)
 }
 

@@ -58,16 +58,10 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, response)
 	}
 
-	convUserTgID, err := strconv.Atoi(userTgID)
-	if err != nil {
-		c.log.Error(err)
-		response := helper.BuildErrorResponse("Error", err.Error(), helper.EmptyObj{})
-		ctx.JSON(http.StatusForbidden, response)
-	}
 	c.log.Info(isAllowedToEdit)
 
 	if isAllowedToEdit {
-		c.service.Category.Delete(ctx, category, convUserTgID)
+		c.service.Category.Delete(ctx, category)
 		res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
 		ctx.JSON(http.StatusOK, res)
 	} else {

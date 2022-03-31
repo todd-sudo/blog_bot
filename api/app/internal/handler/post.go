@@ -11,39 +11,56 @@ import (
 )
 
 func (c *Handler) AllPost(ctx *gin.Context) {
-	posts, err := c.service.Post.All(ctx)
+	userIdString := ctx.GetHeader("user_id")
+	userId, err := strconv.Atoi(userIdString)
+	if err != nil {
+		response := helper.BuildErrorResponse("Error", err.Error(), helper.EmptyObj{})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
+	}
+
+	posts, err := c.service.Post.All(ctx, userId)
 	if err != nil {
 		c.log.Errorf("get all posts error: %v", err)
+		response := helper.BuildErrorResponse("get all posts error", err.Error(), helper.EmptyObj{})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
+		return
 	}
 	res := helper.BuildResponse(true, "OK", posts)
 	ctx.JSON(http.StatusOK, res)
 }
 
+// Создание Post
 func (c *Handler) InsertPost(ctx *gin.Context) {
 	var postCreateDTO dto.PostCreateDTO
 	errDTO := ctx.ShouldBind(&postCreateDTO)
 	if errDTO != nil {
-		res := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
+		res := helper.BuildErrorResponse(
+			"Failed to process request",
+			errDTO.Error(),
+			helper.EmptyObj{},
+		)
 		ctx.JSON(http.StatusBadRequest, res)
 	} else {
-		// tgUserID := ctx.GetHeader("tg_user_id")
-		// convertedTgUserID, err := strconv.ParseUint(tgUserID, 10, 64)
-
-		item, err := c.service.Post.Insert(ctx, postCreateDTO)
+		post, err := c.service.Post.Insert(ctx, postCreateDTO)
 		if err != nil {
 			c.log.Errorf("insert post error: %v", err)
 		}
-		response := helper.BuildResponse(true, "OK", item)
+		response := helper.BuildResponse(true, "OK", post)
 		ctx.JSON(http.StatusCreated, response)
 	}
 }
 
-// Удаление Item
+// Удаление Post
 func (c *Handler) DeletePost(ctx *gin.Context) {
 	var post model.Post
 	id, err := strconv.ParseUint(ctx.Param("id"), 0, 0)
 	if err != nil {
-		response := helper.BuildErrorResponse("Failed tou get id", "No param id were found", helper.EmptyObj{})
+		response := helper.BuildErrorResponse(
+			"Failed tou get id",
+			"No param id were found",
+			helper.EmptyObj{},
+		)
 		ctx.JSON(http.StatusBadRequest, response)
 	}
 	post.ID = id
@@ -53,7 +70,11 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 	c.log.Info(isAllowedToEdit)
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
-		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
+		response := helper.BuildErrorResponse(
+			"is allowed to edit error",
+			err.Error(),
+			helper.EmptyObj{},
+		)
 		ctx.JSON(http.StatusForbidden, response)
 	}
 
@@ -62,7 +83,11 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 		res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
 		ctx.JSON(http.StatusOK, res)
 	} else {
-		response := helper.BuildErrorResponse("You dont have permission", "You are not the owner", helper.EmptyObj{})
+		response := helper.BuildErrorResponse(
+			"You dont have permission",
+			"You are not the owner",
+			helper.EmptyObj{},
+		)
 		ctx.JSON(http.StatusForbidden, response)
 	}
 }
