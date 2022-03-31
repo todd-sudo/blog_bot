@@ -13,12 +13,20 @@ import (
 func (c *Handler) AllCategory(ctx *gin.Context) {
 	userTgId := ctx.GetHeader("tg_user_id")
 	convUserTgId, err := strconv.Atoi(userTgId)
+	c.log.Info(convUserTgId)
 	if err != nil {
 		c.log.Error(err)
+		res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusBadRequest, res)
 	}
+	c.log.Info("я тут")
 	categories, err := c.service.Category.All(ctx, convUserTgId)
+	c.log.Infof("%+v", categories)
 	if err != nil {
 		c.log.Errorf("get all categories error: %v", err)
+		res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusBadRequest, res)
+		return
 	}
 	res := helper.BuildResponse(true, "OK", categories)
 	ctx.JSON(http.StatusOK, res)
@@ -30,10 +38,14 @@ func (c *Handler) InsertCategory(ctx *gin.Context) {
 	if errDTO != nil {
 		res := helper.BuildErrorResponse("Failed to process request", errDTO.Error(), helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, res)
+		return
 	} else {
 		category, err := c.service.Category.Insert(ctx, categoryCreateDTO)
 		if err != nil {
 			c.log.Errorf("insert category error: %v", err)
+			res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
+			ctx.JSON(http.StatusBadRequest, res)
+			return
 		}
 		response := helper.BuildResponse(true, "OK", category)
 		ctx.JSON(http.StatusCreated, response)
@@ -47,6 +59,7 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 	if err != nil {
 		response := helper.BuildErrorResponse("Failed tou get id", "No param id were found", helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, response)
+		return
 	}
 	category.ID = id
 	userTgID := ctx.GetHeader("user_id")
@@ -56,6 +69,7 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 		c.log.Errorf("is allowed to edit error: %v", err)
 		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
 		ctx.JSON(http.StatusForbidden, response)
+		return
 	}
 
 	c.log.Info(isAllowedToEdit)
@@ -67,6 +81,7 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 	} else {
 		response := helper.BuildErrorResponse("You dont have permission", "You are not the owner", helper.EmptyObj{})
 		ctx.JSON(http.StatusForbidden, response)
+		return
 	}
 
 }

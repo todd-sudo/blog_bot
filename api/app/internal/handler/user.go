@@ -18,16 +18,19 @@ func (c *Handler) CreateUser(ctx *gin.Context) {
 	}
 
 	userStatus, err := c.service.User.IsDuplicateUserTGID(ctx, createDTO.UserTGId)
-	c.log.Infoln(userStatus)
+	c.log.Errorln(err)
 	if err == nil || userStatus {
 		response := helper.BuildErrorResponse("Failed to process request", "Duplicate user_tg_id", helper.EmptyObj{})
 		ctx.JSON(http.StatusConflict, response)
+		return
 	} else {
 		createdUser, err := c.service.User.Insert(ctx, createDTO)
 		if err != nil {
 			c.log.Errorf("create user failed: %v", err)
+			response := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
+			ctx.JSON(http.StatusConflict, response)
+			return
 		}
-
 		response := helper.BuildResponse(true, "OK!", createdUser)
 		ctx.JSON(http.StatusCreated, response)
 	}
@@ -38,7 +41,10 @@ func (c *Handler) ProfileUser(ctx *gin.Context) {
 	id := ctx.GetHeader("user_tg_id")
 	user, err := c.service.User.Profile(ctx, id)
 	if err != nil {
-		c.log.Errorf("profile user error : %v", err)
+		c.log.Errorf("profile user error: %v", err)
+		response := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusConflict, response)
+		return
 	}
 	res := helper.BuildResponse(true, "OK", user)
 	ctx.JSON(http.StatusOK, res)

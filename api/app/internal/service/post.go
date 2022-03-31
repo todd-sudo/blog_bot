@@ -41,6 +41,7 @@ func (s *postService) Insert(ctx context.Context, p dto.PostCreateDTO) (*model.P
 	err := smapping.FillStruct(&post, smapping.MapFields(&p))
 	if err != nil {
 		s.log.Errorf("Failed map %v: ", err)
+		return nil, err
 	}
 	postM, errI := s.postRepository.InsertPost(ctx, post)
 	if errI != nil {

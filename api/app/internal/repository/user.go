@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/todd-sudo/blog_bot/api/internal/model"
 	"github.com/todd-sudo/blog_bot/api/pkg/logging"
@@ -33,8 +34,9 @@ func NewUserRepository(ctx context.Context, db *gorm.DB, log logging.Logger) Use
 func (db *userConnection) IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error) {
 	var user *model.User
 	res := db.connection.WithContext(ctx).Where("user_tg_id = ?", tgID).Take(&user)
-	db.log.Debug(res.Error)
-	if res.Error != nil {
+	if errors.Is(gorm.ErrRecordNotFound, res.Error) {
+		return true, res.Error
+	} else if res.Error != nil {
 		db.log.Error(res.Error)
 		return true, res.Error
 	}

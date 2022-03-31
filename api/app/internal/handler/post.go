@@ -14,6 +14,7 @@ func (c *Handler) AllPost(ctx *gin.Context) {
 	userIdString := ctx.GetHeader("user_id")
 	userId, err := strconv.Atoi(userIdString)
 	if err != nil {
+		c.log.Error(err)
 		response := helper.BuildErrorResponse("Error", err.Error(), helper.EmptyObj{})
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, response)
 		return
@@ -41,10 +42,14 @@ func (c *Handler) InsertPost(ctx *gin.Context) {
 			helper.EmptyObj{},
 		)
 		ctx.JSON(http.StatusBadRequest, res)
+		return
 	} else {
 		post, err := c.service.Post.Insert(ctx, postCreateDTO)
 		if err != nil {
 			c.log.Errorf("insert post error: %v", err)
+			res := helper.BuildErrorResponse("insert post error", err.Error(), helper.EmptyObj{})
+			ctx.JSON(http.StatusBadRequest, res)
+			return
 		}
 		response := helper.BuildResponse(true, "OK", post)
 		ctx.JSON(http.StatusCreated, response)
@@ -89,5 +94,6 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 			helper.EmptyObj{},
 		)
 		ctx.JSON(http.StatusForbidden, response)
+		return
 	}
 }

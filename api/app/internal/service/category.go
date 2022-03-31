@@ -41,6 +41,7 @@ func (s *categoryService) Insert(ctx context.Context, p dto.CreateCategoryDTO) (
 	err := smapping.FillStruct(&category, smapping.MapFields(&p))
 	if err != nil {
 		s.log.Errorf("Failed map %v: ", err)
+		return nil, err
 	}
 	categoryM, errI := s.categoryRepository.InsertCategory(ctx, category)
 	if errI != nil {

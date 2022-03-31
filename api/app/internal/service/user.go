@@ -44,10 +44,12 @@ func (s *userService) Insert(ctx context.Context, user dto.CreateUserDTO) (*mode
 	err := smapping.FillStruct(&userToCreate, smapping.MapFields(&user))
 	if err != nil {
 		s.log.Errorf("Failed map %v:", err)
+		return nil, err
 	}
 	updatedUser, err := s.userRepository.InsertUser(ctx, userToCreate)
 	if err != nil {
 		s.log.Errorf("insert user error: %v", err)
+		return nil, err
 	}
 	return updatedUser, nil
 }

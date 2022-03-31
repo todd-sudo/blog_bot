@@ -29,11 +29,10 @@ func NewPostRepository(ctx context.Context, dbConn *gorm.DB, log logging.Logger)
 	}
 }
 
-// Добавление item
+// Добавление Post
 func (db *postConnection) InsertPost(ctx context.Context, post model.Post) (*model.Post, error) {
 	tx := db.connection.WithContext(ctx)
 	tx.Save(&post)
-	// .Preload("User").Preload("Category")
 	res := tx.Find(&post)
 	if res.Error != nil {
 		db.log.Errorf("insert post error: %v", res.Error)
