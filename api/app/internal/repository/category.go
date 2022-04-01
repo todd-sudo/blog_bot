@@ -71,12 +71,11 @@ func (db *categoryConnection) AllCategory(
 
 	tx := db.connection.WithContext(ctx)
 	var categories []*model.Category
-	db.log.Info("я тут")
+	db.log.Info("я тут") //.Joins("User")
 	res := tx.Joins("Posts").Joins("User").Preload("User").Where(
 		`"User"."user_tg_id" = ?`,
 		userTgId,
 	).Find(&categories)
-	db.log.Error(res)
 	if res.Error != nil {
 		db.log.Errorf("get all categories error %v", res.Error)
 		return nil, res.Error
