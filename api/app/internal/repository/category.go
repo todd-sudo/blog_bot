@@ -10,9 +10,9 @@ import (
 
 type CategoryRepository interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
-	DeleteCategory(ctx context.Context, category model.Category) error
-	AllCategory(ctx context.Context, userId int) ([]*model.Category, error)
-	FindCategoryByID(ctx context.Context, categoryID uint64) (*model.Category, error)
+	DeleteCategory(ctx context.Context, category model.Category, userId int) error
+	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
+	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type categoryConnection struct {
@@ -33,19 +33,19 @@ func NewCategoryRepository(
 	}
 }
 
-func (db *categoryConnection) FindCategoryByID(
+func (db *categoryConnection) FindUserByTgUserId(
 	ctx context.Context,
-	categoryID uint64,
-) (*model.Category, error) {
+	userTgId int,
+) (*model.User, error) {
 
 	tx := db.connection.WithContext(ctx)
-	var category model.Category
-	res := tx.Find(&category, categoryID)
+	var user model.User
+	res := tx.Find(&user, userTgId)
 	if res.Error != nil {
-		db.log.Errorf("find category by id error %v", res.Error)
+		db.log.Errorf("find user by user_tg_id error %v", res.Error)
 		return nil, res.Error
 	}
-	return &category, nil
+	return &user, nil
 }
 
 func (db *categoryConnection) InsertCategory(
@@ -71,11 +71,12 @@ func (db *categoryConnection) AllCategory(
 
 	tx := db.connection.WithContext(ctx)
 	var categories []*model.Category
-	db.log.Info("я тут") //.Joins("User")
-	res := tx.Joins("Posts").Joins("User").Preload("User").Where(
-		`"User"."user_tg_id" = ?`,
+
+	res := tx.Preload("User").Joins("User").Where(
+		`"user_tg_id" = ?`,
 		userTgId,
 	).Find(&categories)
+
 	if res.Error != nil {
 		db.log.Errorf("get all categories error %v", res.Error)
 		return nil, res.Error
@@ -87,10 +88,11 @@ func (db *categoryConnection) AllCategory(
 func (db *categoryConnection) DeleteCategory(
 	ctx context.Context,
 	category model.Category,
+	userId int,
 ) error {
 
 	tx := db.connection.WithContext(ctx)
-	res := tx.Select("Posts").Delete(&category)
+	res := tx.Select("Posts").Delete(&category, userId)
 	if res.Error != nil {
 		db.log.Errorf("delete category error %v", res.Error)
 		return res.Error
