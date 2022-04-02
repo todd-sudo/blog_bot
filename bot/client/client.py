@@ -10,20 +10,28 @@ domain = get_domain()
 class Client:
     headers: dict
     cookies: dict
+    url: str
 
-    def __init__(self, headers: dict = None, cookies: dict = None):
+    def __init__(
+            self, headers: dict = None,
+            cookies: dict = None,
+            url: str = None
+    ):
         self.headers = headers
         self.cookies = cookies
+        self.url = domain + url
 
     async def get(self):
         async with aiohttp.ClientSession() as session:
-            pass
+            response = await session.get(
+                url=self.url, headers=self.headers
+            )
+            return response
 
     async def post(self, data: dict):
-        url = domain + "/api/user/create-user"
         async with aiohttp.ClientSession() as session:
             response = await session.post(
-                    url=url, json=data, headers=self.headers
+                    url=self.url, json=data, headers=self.headers
             )
             return response
 

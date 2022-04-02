@@ -16,7 +16,7 @@ func (c *Handler) AllPost(ctx *gin.Context) {
 	if err != nil {
 		c.log.Error(err)
 		res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
-		ctx.JSON(http.StatusBadRequest, res)
+		ctx.JSON(http.StatusConflict, res)
 	}
 
 	posts, err := c.service.Post.All(ctx, convUserTgId)
@@ -47,7 +47,7 @@ func (c *Handler) InsertPost(ctx *gin.Context) {
 		if err != nil {
 			c.log.Errorf("FindUserByTgUserId category error: %v", err)
 			res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
-			ctx.JSON(http.StatusBadRequest, res)
+			ctx.JSON(http.StatusForbidden, res)
 			return
 		}
 		postCreateDTO.UserID = user.ID
@@ -76,6 +76,7 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 			helper.EmptyObj{},
 		)
 		ctx.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	post.ID = id
@@ -84,7 +85,8 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
 		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
-		ctx.JSON(http.StatusForbidden, response)
+		ctx.JSON(http.StatusConflict, response)
+		return
 	}
 
 	user, err := c.service.FindUserByTgUserId(ctx, convUserTgId)
@@ -96,8 +98,8 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 			helper.EmptyObj{},
 		)
 		ctx.JSON(http.StatusForbidden, response)
+		return
 	}
-	c.log.Infof("%+v", post)
 	c.service.Post.Delete(ctx, post, int(user.ID))
 	res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
 	ctx.JSON(http.StatusOK, res)

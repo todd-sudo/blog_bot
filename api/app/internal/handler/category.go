@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,12 +18,14 @@ func (c *Handler) AllCategory(ctx *gin.Context) {
 		c.log.Error(err)
 		res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, res)
+		return
 	}
 	categories, err := c.service.Category.All(ctx, convUserTgId)
 	if err != nil {
 		c.log.Errorf("get all categories error: %v", err)
 		res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, res)
+		return
 	}
 	res := helper.BuildResponse(true, "OK", categories)
 	ctx.JSON(http.StatusOK, res)
@@ -40,16 +43,18 @@ func (c *Handler) InsertCategory(ctx *gin.Context) {
 		if err != nil {
 			c.log.Errorf("FindUserByTgUserId category error: %v", err)
 			res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
-			ctx.JSON(http.StatusBadRequest, res)
+			ctx.JSON(http.StatusConflict, res)
 			return
 		}
 
+		fmt.Printf("%+v", user)
 		categoryCreateDTO.UserID = user.ID
+		c.log.Infof("%+v", categoryCreateDTO)
 		category, err := c.service.Category.Insert(ctx, categoryCreateDTO)
 		if err != nil {
 			c.log.Errorf("insert category error: %v", err)
 			res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
-			ctx.JSON(http.StatusBadRequest, res)
+			ctx.JSON(http.StatusConflict, res)
 			return
 		}
 		response := helper.BuildResponse(true, "OK", category)
@@ -73,7 +78,7 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
 		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
-		ctx.JSON(http.StatusForbidden, response)
+		ctx.JSON(http.StatusConflict, response)
 		return
 	}
 
@@ -81,7 +86,7 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
 		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
-		ctx.JSON(http.StatusForbidden, response)
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
 	c.service.Category.Delete(ctx, category, int(user.ID))

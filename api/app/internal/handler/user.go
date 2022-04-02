@@ -46,6 +46,12 @@ func (c *Handler) ProfileUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusConflict, response)
 		return
 	}
+
+	if user.UserTGId == 0 {
+		response := helper.BuildErrorResponse("Failed to process request", "Такого пользователя нет", helper.EmptyObj{})
+		ctx.JSON(http.StatusNotFound, response)
+		return
+	}
 	res := helper.BuildResponse(true, "OK", user)
 	ctx.JSON(http.StatusOK, res)
 

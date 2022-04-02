@@ -51,7 +51,7 @@ func (db *userConnection) FindUserByTgUserId(
 
 	tx := db.connection.WithContext(ctx)
 	var user model.User
-	res := tx.Find(&user).Where(`"user_tg_id" = ?`, userTgId)
+	res := tx.Where(`"user_tg_id" = ?`, userTgId).Find(&user)
 	if res.Error != nil {
 		db.log.Errorf("find user by user_tg_id error %v", res.Error)
 		return nil, res.Error
@@ -63,7 +63,7 @@ func (db *userConnection) FindUserByTgUserId(
 func (db *userConnection) InsertUser(ctx context.Context, user model.User) (*model.User, error) {
 	tx := db.connection.WithContext(ctx)
 	res := tx.Save(&user)
-	if res.Error != nil {
+	if !errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		db.log.Errorf("insert user error %v", res.Error)
 		return nil, res.Error
 	}
