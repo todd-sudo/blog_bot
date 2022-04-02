@@ -4,6 +4,7 @@ from aiogram import types
 
 from client.client import Client
 from config.loader import dp
+from keyboards.category import get_all_categories_keyboards
 
 
 @dp.message_handler(commands=["start"])
@@ -15,7 +16,7 @@ async def create_user(message: types.Message):
         "username": message.from_user.username,
         "user_tg_id": message.from_user.id
     })
-    if response.status == 200:
+    if response.status in [200, 201]:
         await message.answer("Вы успешно зарегистрированы!")
     elif response.status == 409:
         await message.answer("Вы уже зарегистрированы!")
@@ -46,5 +47,6 @@ async def profile_user(message: types.Message):
         await message.answer(
             f"Ваш профиль:\n\nUsername - {username}\n"
             f"Имя - {first_name}\nФамилия - {last_name}\n"
-            f"Телеграм ID - {user_tg_id}"
+            f"Телеграм ID - {user_tg_id}",
+            reply_markup=get_all_categories_keyboards()
         )
