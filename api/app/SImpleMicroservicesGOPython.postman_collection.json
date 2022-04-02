@@ -19,7 +19,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"first_name\": \"todd2\",\n    \"last_name\": \"qwe\",\n    \"username\": \"todd2\",\n    \"user_tg_id\": 5132513\n}",
+					"raw": "{\n    \"first_name\": \"11113fsfsf31\",\n    \"last_name\": \"qwe\",\n    \"username\": \"todd2\",\n    \"user_tg_id\": 5132513\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -59,7 +59,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"first\",\n    \"user_id\": 1\n}",
+					"raw": "{\n    \"name\": \"qweqwe\",\n    \"user_tg_id\": 5132513\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -91,7 +91,7 @@
 				"method": "GET",
 				"header": [
 					{
-						"key": "tg_user_id",
+						"key": "user_tg_id",
 						"value": "5132513",
 						"type": "text"
 					}
@@ -121,15 +121,15 @@
 				"method": "POST",
 				"header": [
 					{
-						"key": "user_id",
-						"value": "5212341",
+						"key": "",
+						"value": "",
 						"type": "text",
 						"disabled": true
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"title\": \"12123123\",\n    \"content\": \"adasd\",\n    \"user_id\": 1,\n    \"category_id\": 3\n}",
+					"raw": "{\n    \"title\": \"sdghdsh\",\n    \"content\": \"sgsdeghdgdgdgdfgdfg\",\n    \"user_tg_id\": 5132513,\n    \"category_id\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -191,13 +191,13 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "user_id",
-						"value": "1",
+						"key": "user_tg_id",
+						"value": "5132513",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/posts/2",
+					"raw": "http://127.0.0.1:8000/api/posts/5",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -209,7 +209,7 @@
 					"path": [
 						"api",
 						"posts",
-						"2"
+						"5"
 					]
 				}
 			},
@@ -221,13 +221,13 @@
 				"method": "DELETE",
 				"header": [
 					{
-						"key": "user_id",
-						"value": "1",
+						"key": "user_tg_id",
+						"value": "5132513",
 						"type": "text"
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:8000/api/categories/2",
+					"raw": "http://127.0.0.1:8000/api/categories/1",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -239,7 +239,7 @@
 					"path": [
 						"api",
 						"categories",
-						"2"
+						"1"
 					]
 				}
 			},
@@ -251,9 +251,15 @@
 				"method": "GET",
 				"header": [
 					{
-						"key": "user_id",
-						"value": "1",
+						"key": "user_tg_id",
+						"value": "5132513",
 						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"url": {
