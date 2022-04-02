@@ -77,6 +77,7 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 		)
 		ctx.JSON(http.StatusBadRequest, response)
 	}
+
 	post.ID = id
 	userTgID := ctx.GetHeader("user_tg_id")
 	convUserTgId, err := strconv.Atoi(userTgID)
