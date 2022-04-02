@@ -38,11 +38,12 @@ func (c *Handler) InsertCategory(ctx *gin.Context) {
 	} else {
 		user, err := c.service.FindUserByTgUserId(ctx, categoryCreateDTO.UserTgId)
 		if err != nil {
-			c.log.Errorf("insert category error: %v", err)
+			c.log.Errorf("FindUserByTgUserId category error: %v", err)
 			res := helper.BuildErrorResponse("Failed to process request", err.Error(), helper.EmptyObj{})
 			ctx.JSON(http.StatusBadRequest, res)
 			return
 		}
+
 		categoryCreateDTO.UserID = user.ID
 		category, err := c.service.Category.Insert(ctx, categoryCreateDTO)
 		if err != nil {
@@ -66,8 +67,8 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 	category.ID = id
-	userTgID := ctx.GetHeader("user_tg_id")
 
+	userTgID := ctx.GetHeader("user_tg_id")
 	convUserTgId, err := strconv.Atoi(userTgID)
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
@@ -75,6 +76,7 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, response)
 		return
 	}
+
 	user, err := c.service.FindUserByTgUserId(ctx, convUserTgId)
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)

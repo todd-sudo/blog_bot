@@ -12,7 +12,6 @@ type CategoryRepository interface {
 	InsertCategory(ctx context.Context, c model.Category) (*model.Category, error)
 	DeleteCategory(ctx context.Context, category model.Category, userId int) error
 	AllCategory(ctx context.Context, userTgId int) ([]*model.Category, error)
-	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type categoryConnection struct {
@@ -31,21 +30,6 @@ func NewCategoryRepository(
 		connection: dbConn,
 		log:        log,
 	}
-}
-
-func (db *categoryConnection) FindUserByTgUserId(
-	ctx context.Context,
-	userTgId int,
-) (*model.User, error) {
-
-	tx := db.connection.WithContext(ctx)
-	var user model.User
-	res := tx.Find(&user, userTgId)
-	if res.Error != nil {
-		db.log.Errorf("find user by user_tg_id error %v", res.Error)
-		return nil, res.Error
-	}
-	return &user, nil
 }
 
 func (db *categoryConnection) InsertCategory(

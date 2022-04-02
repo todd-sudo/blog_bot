@@ -14,7 +14,6 @@ type CategoryService interface {
 	Insert(ctx context.Context, p dto.CreateCategoryDTO) (*model.Category, error)
 	Delete(ctx context.Context, b model.Category, userTgId int) error
 	All(ctx context.Context, userTgId int) ([]*model.Category, error)
-	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type categoryService struct {
@@ -35,9 +34,9 @@ func NewCategoryService(
 	}
 }
 
-func (s *categoryService) Insert(ctx context.Context, p dto.CreateCategoryDTO) (*model.Category, error) {
+func (s *categoryService) Insert(ctx context.Context, c dto.CreateCategoryDTO) (*model.Category, error) {
 	category := model.Category{}
-	err := smapping.FillStruct(&category, smapping.MapFields(&p))
+	err := smapping.FillStruct(&category, smapping.MapFields(&c))
 	if err != nil {
 		s.log.Errorf("Failed map %v: ", err)
 		return nil, err
@@ -66,13 +65,4 @@ func (s *categoryService) All(ctx context.Context, userTgId int) ([]*model.Categ
 		return nil, err
 	}
 	return categories, nil
-}
-
-func (s *categoryService) FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error) {
-	user, err := s.categoryRepository.FindUserByTgUserId(ctx, userTgId)
-	if err != nil {
-		s.log.Errorf("is allowed to edit user error: %v", err)
-		return nil, err
-	}
-	return user, nil
 }

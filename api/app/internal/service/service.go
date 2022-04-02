@@ -11,22 +11,21 @@ import (
 
 type Post interface {
 	Insert(ctx context.Context, b dto.PostCreateDTO) (*model.Post, error)
-	Delete(ctx context.Context, b model.Post) error
-	All(ctx context.Context, userId int) ([]*model.Post, error)
-	IsAllowedToEdit(ctx context.Context, userID string, postID uint64) (bool, error)
+	Delete(ctx context.Context, b model.Post, userId int) error
+	All(ctx context.Context, userTgId int) ([]*model.Post, error)
 }
 
 type User interface {
 	Insert(ctx context.Context, user dto.CreateUserDTO) (*model.User, error)
 	Profile(ctx context.Context, userID string) (*model.User, error)
 	IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error)
+	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type Category interface {
 	Insert(ctx context.Context, p dto.CreateCategoryDTO) (*model.Category, error)
 	Delete(ctx context.Context, b model.Category, userId int) error
 	All(ctx context.Context, userTgId int) ([]*model.Category, error)
-	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type Service struct {

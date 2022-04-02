@@ -14,6 +14,7 @@ type UserRepository interface {
 	InsertUser(ctx context.Context, user model.User) (*model.User, error)
 	ProfileUser(ctx context.Context, userID string) (*model.User, error)
 	IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error)
+	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type userConnection struct {
@@ -41,6 +42,21 @@ func (db *userConnection) IsDuplicateUserTGID(ctx context.Context, tgID int) (bo
 		return true, res.Error
 	}
 	return false, nil
+}
+
+func (db *userConnection) FindUserByTgUserId(
+	ctx context.Context,
+	userTgId int,
+) (*model.User, error) {
+
+	tx := db.connection.WithContext(ctx)
+	var user model.User
+	res := tx.Find(&user).Where(`"user_tg_id" = ?`, userTgId)
+	if res.Error != nil {
+		db.log.Errorf("find user by user_tg_id error %v", res.Error)
+		return nil, res.Error
+	}
+	return &user, nil
 }
 
 // Добавление пользователя

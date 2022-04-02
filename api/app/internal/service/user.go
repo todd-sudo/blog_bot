@@ -14,6 +14,7 @@ type UserService interface {
 	Insert(ctx context.Context, user dto.CreateUserDTO) (*model.User, error)
 	Profile(ctx context.Context, userID string) (*model.User, error)
 	IsDuplicateUserTGID(ctx context.Context, tgID int) (bool, error)
+	FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error)
 }
 
 type userService struct {
@@ -62,4 +63,13 @@ func (s *userService) Profile(ctx context.Context, userID string) (*model.User, 
 		return nil, err
 	}
 	return userProfile, nil
+}
+
+func (s *userService) FindUserByTgUserId(ctx context.Context, userTgId int) (*model.User, error) {
+	user, err := s.userRepository.FindUserByTgUserId(ctx, userTgId)
+	if err != nil {
+		s.log.Errorf("is allowed to edit user error: %v", err)
+		return nil, err
+	}
+	return user, nil
 }
