@@ -37,4 +37,5 @@ class Client:
 
     async def delete(self):
         async with aiohttp.ClientSession() as session:
-            pass
+            response = await session.delete(url=self.url, headers=self.headers)
+            return response

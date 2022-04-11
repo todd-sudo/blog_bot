@@ -83,14 +83,22 @@ func (c *Handler) DeleteCategory(ctx *gin.Context) {
 	}
 
 	user, err := c.service.FindUserByTgUserId(ctx, convUserTgId)
+	c.log.Printf("is handler %+v", category)
 	if err != nil {
 		c.log.Errorf("is allowed to edit error: %v", err)
 		response := helper.BuildErrorResponse("is allowed to edit error", err.Error(), helper.EmptyObj{})
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	c.service.Category.Delete(ctx, category, int(user.ID))
+
+	err = c.service.Category.Delete(ctx, category, int(user.ID))
+	if err != nil {
+		c.log.Errorf("delete category error: %v", err)
+		response := helper.BuildErrorResponse("delete category error", err.Error(), helper.EmptyObj{})
+		ctx.JSON(http.StatusBadRequest, response)
+	}
+
 	res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
-	ctx.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusNoContent, res)
 
 }

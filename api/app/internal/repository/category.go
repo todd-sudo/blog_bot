@@ -74,9 +74,10 @@ func (db *categoryConnection) DeleteCategory(
 	category model.Category,
 	userId int,
 ) error {
-
+	db.log.Printf("из репозитория userID = %d", userId)
 	tx := db.connection.WithContext(ctx)
-	res := tx.Select("Posts").Delete(&category, userId)
+	res := tx.Select("Posts").Delete(&category).Where(`user_id = ?`, userId)
+	db.log.Printf("%+v", category)
 	if res.Error != nil {
 		db.log.Errorf("delete category error %v", res.Error)
 		return res.Error
