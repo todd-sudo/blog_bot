@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -47,7 +46,6 @@ func (c *Handler) InsertCategory(ctx *gin.Context) {
 			return
 		}
 
-		fmt.Printf("%+v", user)
 		categoryCreateDTO.UserID = user.ID
 		c.log.Infof("%+v", categoryCreateDTO)
 		category, err := c.service.Category.Insert(ctx, categoryCreateDTO)

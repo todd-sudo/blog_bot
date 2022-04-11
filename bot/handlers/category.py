@@ -1,6 +1,5 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.utils.callback_data import CallbackData
 
 from client.client import Client
 from config.loader import dp, bot
@@ -45,15 +44,17 @@ async def get_all_categories(call: types.CallbackQuery):
     response = await client.get()
     data = await response.json()
     categories = data.get("data")
-
-    for c in categories:
-        button = types.InlineKeyboardButton(
-            text=c.get("name"),
-            callback_data=cb.new(c_id=c.get("id"))
-        )
-        reply_markup = types.InlineKeyboardMarkup()
-        reply_markup.add(button)
-        await call.message.answer(c.get("name"), reply_markup=reply_markup)
+    if categories:
+        for c in categories:
+            button = types.InlineKeyboardButton(
+                text="Удалить ❌",
+                callback_data=cb.new(c_id=c.get("id"))
+            )
+            reply_markup = types.InlineKeyboardMarkup()
+            reply_markup.add(button)
+            await call.message.answer(c.get("name"), reply_markup=reply_markup)
+    else:
+        await call.message.answer("У вас нет категорий")
 
 
 @dp.callback_query_handler(cb.filter())
@@ -68,6 +69,6 @@ async def delete_category(call: types.CallbackQuery, callback_data: dict):
     if status_code == 204:
         msg = call.message.message_id
         await bot.delete_message(call.message.chat.id, msg)
-        await call.message.answer("Категория успешно удалена!")
+        await call.message.answer("Категория успешно удалена 🆗")
     else:
-        await call.message.answer("Ошибка! Обратитесь к администратору! /admin")
+        await call.message.answer("Ошибка! Обратитесь к администратору 🙊 /admin")
