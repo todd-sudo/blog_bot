@@ -3,13 +3,13 @@ from aiogram.dispatcher import FSMContext
 
 from client.client import Client
 from config.loader import dp, bot
-from keyboards.category import get_callback_data
+from keyboards.keyboard import get_callback_data_category, create_category_keyboards
 from states.create_category import CategoryState
 
 
-@dp.message_handler(commands=["create_category"])
-async def create_category(message: types.Message):
-    await message.answer('Введите название категории...')
+@dp.callback_query_handler(text="add_category")
+async def create_category(call: types.CallbackQuery):
+    await call.message.answer('Введите название категории...')
     await CategoryState.name.set()
 
 
@@ -32,7 +32,7 @@ async def set_name_category(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-cb = get_callback_data()
+cb = get_callback_data_category()
 
 
 @dp.callback_query_handler(text="categories")
@@ -54,7 +54,9 @@ async def get_all_categories(call: types.CallbackQuery):
             reply_markup.add(button)
             await call.message.answer(c.get("name"), reply_markup=reply_markup)
     else:
-        await call.message.answer("У вас нет категорий")
+        await call.message.answer(
+            "У вас нет категорий", reply_markup=create_category_keyboards()
+        )
 
 
 @dp.callback_query_handler(cb.filter())

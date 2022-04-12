@@ -1,10 +1,8 @@
-import json
-
 from aiogram import types
 
 from client.client import Client
 from config.loader import dp
-from keyboards.category import get_all_categories_keyboards
+from keyboards.keyboard import profile_keyboards
 
 
 @dp.message_handler(commands=["start"])
@@ -48,5 +46,5 @@ async def profile_user(message: types.Message):
             f"Ваш профиль:\n\nUsername - {username}\n"
             f"Имя - {first_name}\nФамилия - {last_name}\n"
             f"Телеграм ID - {user_tg_id}",
-            reply_markup=get_all_categories_keyboards()
+            reply_markup=profile_keyboards()
         )

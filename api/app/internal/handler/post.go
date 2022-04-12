@@ -102,6 +102,6 @@ func (c *Handler) DeletePost(ctx *gin.Context) {
 	}
 	c.service.Post.Delete(ctx, post, int(user.ID))
 	res := helper.BuildResponse(true, "Deleted", helper.EmptyObj{})
-	ctx.JSON(http.StatusOK, res)
+	ctx.JSON(http.StatusNoContent, res)
 
 }
